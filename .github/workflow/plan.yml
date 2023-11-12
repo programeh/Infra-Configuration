@@ -1,0 +1,50 @@
+name: build
+
+run-name: ${{ github.ref_name }}-${{ github.run_number }}
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  diff:
+    concurrency:
+      group: diff-${{ github.ref_name }}
+    runs-on: 'ubuntu-latest'
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: 'ap-south-1'
+
+    if: (github.event_name != 'workflow_dispatch'
+      || (github.event_name == 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')))
+      && (github.ref != 'refs/heads/main' || (github.ref == 'refs/heads/main' && github.run_attempt == 1))
+    steps:
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1.8.0
+        with:
+          app_id: ${{ secrets.PROGRAMEH_BOT_ID }}
+          private_key: ${{ secrets.PROGRAMEH_BOT_PRIVATE_ACCESS_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: setup terraform
+        uses: hasicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: terraform init
+        id: init
+        run: terraform init
+
+      - name: terraform plan
+        id: plan
+        run: terraform plan

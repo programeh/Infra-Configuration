@@ -1,8 +1,10 @@
 terraform {
-  backend "s3" {
-    bucket = "terraform-20230825133837764000000001"
-    key    = "staging/terraform.tfstate"
-    region = "us-east-1"
+  cloud {
+    organization = "programeh"
+
+    workspaces {
+      name = "InfraConfiguration"
+    }
   }
   required_providers {
     aws = {
@@ -14,5 +16,5 @@ terraform {
 
 
 provider "aws" {
-  region = "us-east-1"
+  region = "ap-south-1"
 }
