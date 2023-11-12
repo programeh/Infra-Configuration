@@ -46,7 +46,8 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
-
+      - name: Display AWS CLI configuration
+        run: aws configure list
       - name: terraform init
         id: init
         run: terraform init
