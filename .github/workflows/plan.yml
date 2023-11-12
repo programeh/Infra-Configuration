@@ -43,16 +43,8 @@ jobs:
 
       - name: terraform plan
         id: plan
-        run: terraform plan -out=tfplan
-      - name: Create Asset
-        run: zip  tfplan.zip tfplan
-
-      - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v2
-        with:
-          name: tfplan
-          path: tfplan
-
+        run: terraform plan
+    
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
         id: create_release
@@ -64,18 +56,7 @@ jobs:
           release_name: ${{ github.ref_name }}.${{ github.run_number }}
           draft: true
           prerelease: false
-
-      - name: Upload assets to the release
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: tfplan.zip
-          asset_name: tfplan.zip
-          asset_content_type: application/zip
-
+        
       - name: Delete older drafted releases
         if: github.ref == 'refs/heads/main'
         uses: sgpublic/delete-release-action@v1.1
