@@ -1,16 +1,24 @@
+data "aws_ami" "ubuntu" {
+  most_recent = true
 
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
 
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 
+  owners = ["099720109477"] # Canonical
+}
 
-module "vpc" {
-  source = "../modules/vpc"
-  region = "us-east-1"
-  project_name = "dummy_project"
-  vpc_cidr = "10.0.0.0/16"
-  public_subnet_az1_cidr = "10.0.0.0/24"
-  public_subnet_az2_cidr = "10.0.1.0/24"
-  private_subnet_az1_cidr = "10.0.2.0/24"
-  private_subnet_az2_cidr = "10.0.3.0/24"
-  private_data_subnet_az1_cidr = "10.0.4.0/24"
-  private_data_subnet_az2_cidr = "10.0.5.0/24"
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+
+  tags = {
+    Name = "HelloWorld"
+  }
 }
