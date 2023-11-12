@@ -65,4 +65,7 @@ jobs:
           draft-drop-count: 0
         env:
             GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+      - name: Publish Release link
+        if: github.ref == 'refs/heads/main'
+        run: echo "You can publish release from here - ${{ steps.create_release.outputs.html_url }}"
 
