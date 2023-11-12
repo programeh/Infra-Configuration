@@ -56,8 +56,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         with:
-          tag_name: v${{ steps.get-date.outputs.date }}.${{ github.run_number }}
-          release_name: v${{ steps.get-date.outputs.date }}.${{ github.run_number }}
+          tag_name: ${{ github.ref_name }}.${{ github.run_number }}
+          release_name: ${{ github.ref_name }}.${{ github.run_number }}
           draft: true
           prerelease: false
 
