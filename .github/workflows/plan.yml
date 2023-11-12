@@ -47,6 +47,7 @@ jobs:
 
       - name: Post Plan
         uses: robburger/terraform-pr-commenter@v1
+        if: always() && github.ref != 'refs/heads/main' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
           EXPAND_SUMMARY_DETAILS: 'true' # Override global environment variable; expand details just for this step
