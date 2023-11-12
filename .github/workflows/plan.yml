@@ -43,7 +43,7 @@ jobs:
 
       - name: terraform plan
         id: plan
-        run: terraform plan && terraform show -json my-tfplan.json
+        run: terraform plan -out=my-tfplan.json -json
 
       - name: Post Plan
         uses: liatrio/terraform-change-pr-commenter@v1.4.1
