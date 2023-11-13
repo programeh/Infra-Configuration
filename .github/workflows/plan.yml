@@ -60,6 +60,8 @@ jobs:
       - name: Post Plan
         if: always() && github.ref != 'refs/heads/main' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
         uses: Jimdo/terraform-pr-commenter@main
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
         with:
           commenter_type: plan
           commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
