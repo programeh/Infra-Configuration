@@ -1,5 +1,5 @@
 module "vpc" {
-  source                       = "../modules/vpc"
+  source                       = "modules/vpc"
   region                       = "us-east-1"
   project_name                 = "dummy_project"
   vpc_cidr                     = "10.0.0.0/16"
