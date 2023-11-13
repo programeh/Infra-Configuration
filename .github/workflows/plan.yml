@@ -44,17 +44,7 @@ jobs:
 
       - name: terraform plan
         id: plan
-        run: terraform plan -out=my-tfplan.json -json
-
-      - name: Post Plan
-        uses: liatrio/terraform-change-pr-commenter@v1.4.1
-        if: always() && github.ref != 'refs/heads/main' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-
-        with:
-          json-file: my-tfplan.json
-          expand-comment: 'true'
+        run: terraform plan
 
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
