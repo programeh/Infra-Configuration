@@ -36,6 +36,17 @@ jobs:
       - name: terraform init
         id: init
         run: terraform init
+      - name: Download Asset
+        uses: robinraju/release-downloader@v1.8
+        with:
+            repository: programeh/Infra-Configuration
+            tag: ${{ github.event.release.name }}
+            fileName: diff.zip
+            token: ${{ steps.generate_token.outputs.token }}
+      - name: unzip file
+        run: |
+          unzip diff.zip 
+
       - name: terraform apply
         id: apply
-        run: terraform apply --auto-approve
+        run: terraform apply workspace.plan --auto-approve
