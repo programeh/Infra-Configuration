@@ -59,7 +59,7 @@ jobs:
         with:
           output_file: ${{ github.workspace }}/plan_output.txt
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
 
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
