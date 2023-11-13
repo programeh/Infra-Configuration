@@ -63,22 +63,18 @@ jobs:
         with:
            github-token: ${{ steps.generate_token.outputs.token }}
            script: |
-             const output = `#### Terraform Plan \`${{ steps.plan.outcome }}\`
-              
-             <details><summary>Show Validate Output</summary>
-              
-              \`\`\`${process.env.PLAN}\`\`\`
-              
-              </details>
-              
-              *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
-
-              github.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: output
-              })
+             const output = ` ### Report
+             
+              #### Terraform Plan - \`${{ steps.plan-check.outputs.check }}\` - 📖
+             
+               \`\`\`${process.env.PLAN}\`\`\` `;
+             
+               github.issues.createComment({
+                   issue_number: context.issue.number,
+                   owner: context.repo.owner,
+                   repo: context.repo.repo,
+                   body: output
+                })
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
         id: create_release
