@@ -52,15 +52,32 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -no-color 2>&1 | tee plan_output.txt
+        id: plan
+        run: terraform plan -no-color
 
-      - name: Comment Terraform Plan on PR
-        uses: blinqas/tf-plan-pr-comment@v1
-        with:
-          output_file: plan_output.txt
+      - uses: actions/github-script@v2
+        if: github.event_name == 'pull_request'
         env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          VALIDATE: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+           github-token: ${{ steps.generate_token.outputs.token }}
+           script: |
+             const output = `#### Terraform Validate \`${{ steps.validate.outcome }}\`
+              
+             <details><summary>Show Validate Output</summary>
+              
+              \`\`\`${process.env.VALIDATE}\`\`\`
+              
+              </details>
+              
+              *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
+              github.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
         id: create_release
