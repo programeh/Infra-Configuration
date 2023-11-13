@@ -44,7 +44,18 @@ jobs:
 
       - name: terraform plan
         id: plan
-        run: terraform plan
+        run: terraform plan > output.txt]
+
+      - name: Post Plan
+        if: always() && github.ref != 'refs/heads/main' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
+        uses: robburger/terraform-pr-commenter@v1
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+        with:
+          commenter_type: plan
+          commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+          commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+
 
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
