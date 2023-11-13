@@ -17,6 +17,8 @@ jobs:
     concurrency:
       group: diff-${{ github.ref_name }}
     runs-on: 'ubuntu-latest'
+    env:
+      TF_IN_AUTOMATION: true
 
     if: (github.event_name != 'workflow_dispatch'
       || (github.event_name == 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/')))
@@ -36,6 +38,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_wrapper: false
 
       - name: terraform init
         id: init
@@ -45,16 +48,6 @@ jobs:
         id: plan
         run: terraform plan
 
-      - name: Post Plan
-        uses: robburger/terraform-pr-commenter@v1
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
-          EXPAND_SUMMARY_DETAILS: 'true' # Override global environment variable; expand details just for this step
-        with:
-          commenter_type: plan
-          commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
-          commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
-    
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
         id: create_release
