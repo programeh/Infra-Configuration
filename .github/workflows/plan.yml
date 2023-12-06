@@ -51,10 +51,30 @@ jobs:
         id: init
         run: terraform init
 
-      - name: terraform plan
+      - name: Terraform Plan
         id: plan
-        run: terraform plan
+        run: terraform plan -refresh=true -no-color -detailed-exitcode
+        continue-on-error: true
 
+      - uses: actions/github-script@v2
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "${{ steps.plan.outputs.stderr }}\n${{ steps.plan.outputs.stdout }}"
+        with:
+           github-token: ${{ steps.generate_token.outputs.token }}
+           script: |
+             const output = ` ### Report
+             
+              #### Terraform Plan - \`${{ steps.plan-check.outputs.check }}\` - 📖
+             
+               \`\`\`${process.env.PLAN}\`\`\` `;
+             
+               github.issues.createComment({
+                   issue_number: context.issue.number,
+                   owner: context.repo.owner,
+                   repo: context.repo.repo,
+                   body: output
+                })
       - name: Create Draft Release
         if: github.ref == 'refs/heads/main'
         id: create_release
